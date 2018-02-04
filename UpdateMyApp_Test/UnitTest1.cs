@@ -8,60 +8,119 @@ namespace UpdateMyApp_Test
     [TestClass]
     public class UnitTest1
     {
-        private const string CorrectXmlURL = "https://dl.dropboxusercontent.com/s/mpfyioal1oxbs6v/KeyHolderUpdate.xml";
-        private const string BadXmlURL = "https://dl.dDropboxusercontent.com/s/mpfyioal1oxbs6v/KeyHolderUpdate.xml";
+        private const string CorrectXmlURL = "https://dl.dropboxusercontent.com/s/3a1x9sis8pbekhk/UpdateMyAppTemplate.xml";
+        private const string BadXmlURL = "https://www.guugle.zn/jhbu.xml";
+
+        private const string NewestVersion = "2.0.0";
+        private const string OlderstVersion = "0.1.0";
+        private const string SameVersion = "1.0.0";
 
         [TestMethod]
         [ExpectedException(typeof(AssertFailedException))]
-        public async Task CheckForNewVersionBadDataAsync()
+        public async Task CheckForNewVersionBadDataCorrNullAsync()
         {
             Update.IsEnableError = true;
 
             try
-            {              
-                await Update.CheckForNewVersionAsync(null, null);
-                //Assert.Fail("Expect exception [1]");
-
+            {
                 await Update.CheckForNewVersionAsync(CorrectXmlURL, null);
-                //Assert.Fail("Expect exception [2]");
-
-                await Update.CheckForNewVersionAsync(null, "1.4.4");
-                //Assert.Fail("Expect exception [3]");
-
-                await Update.CheckForNewVersionAsync("", "");
-                //Assert.Fail("Expect exception [4]");
-
-                await Update.CheckForNewVersionAsync(CorrectXmlURL, "");
-                //Assert.Fail("Expect exception [5]");
-
-                await Update.CheckForNewVersionAsync("", "1.4.4");
-                //Assert.Fail("Expect exception [6]");
-
-                await Update.CheckForNewVersionAsync(" ", " ");
-                //Assert.Fail("Expect exception [7]");
-
-                await Update.CheckForNewVersionAsync(CorrectXmlURL, " ");
-                //Assert.Fail("Expect exception [8]");
-
-                await Update.CheckForNewVersionAsync(" ", "1.4.4");
-                //Assert.Fail("Expect exception [9]");
             }
             catch (Exception)
             {
-                Assert.Fail("Expect exception [10]");
-            }            
+                Assert.Fail();
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AssertFailedException))]
+        public async Task CheckForNewVersionBadDataNullCurrAsync()
+        {
+            Update.IsEnableError = true;
+
+            try
+            {
+                await Update.CheckForNewVersionAsync(null, new Version(NewestVersion));
+            }
+            catch (Exception)
+            {
+                Assert.Fail();
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AssertFailedException))]
+        public async Task CheckForNewVersionBadDataCurrEmptyAsync()
+        {
+            Update.IsEnableError = true;
+
+            try
+            {
+                await Update.CheckForNewVersionAsync(CorrectXmlURL, new Version(""));
+            }
+            catch (Exception)
+            {
+                Assert.Fail();
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AssertFailedException))]
+        public async Task CheckForNewVersionBadDataEmptyCurrAsync()
+        {
+            Update.IsEnableError = true;
+
+            try
+            {
+                await Update.CheckForNewVersionAsync("", new Version(NewestVersion));
+            }
+            catch (Exception)
+            {
+                Assert.Fail();
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AssertFailedException))]
+        public async Task CheckForNewVersionBadDataCurrSpaceAsync()
+        {
+            Update.IsEnableError = true;
+
+            try
+            {
+                await Update.CheckForNewVersionAsync(CorrectXmlURL, new Version(" "));
+            }
+            catch (Exception)
+            {
+                Assert.Fail();
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(AssertFailedException))]
+        public async Task CheckForNewVersionBadDataSpaceCurrAsync()
+        {
+            Update.IsEnableError = true;
+
+            try
+            {
+                await Update.CheckForNewVersionAsync(" ", new Version(NewestVersion));
+            }
+            catch (Exception)
+            {
+                Assert.Fail();
+            }
         }
 
         [TestMethod]
         public async Task CheckForNewVersionTrueAsync()
         {
-            Assert.IsTrue(await Update.CheckForNewVersionAsync(CorrectXmlURL, "1.4.0"));
+            Assert.IsTrue(await Update.CheckForNewVersionAsync(CorrectXmlURL, new Version(OlderstVersion)));
         }
 
         [TestMethod]
         public async Task CheckForNewVersionFalseAsync()
         {
-            Assert.IsFalse(await Update.CheckForNewVersionAsync(CorrectXmlURL, "1.4.5"));
+            Assert.IsFalse(await Update.CheckForNewVersionAsync(CorrectXmlURL, new Version(NewestVersion)));
         }
     }
 }
