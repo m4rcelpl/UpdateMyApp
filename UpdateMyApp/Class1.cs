@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -123,6 +126,50 @@ namespace UpdateMyApp
         public static async Task<Dictionary<string, string>> ReadAllValueFromXml(string XmlURL)
         {
             return await ReadXmlFromURL(XmlURL);
+        }
+
+
+        public static async Task DownloadFileAsync(string url)
+        {
+            long totalBytes;
+            long receivedBytes = 0;
+
+            using (var stream = await client.GetStreamAsync(url))
+            {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    byte[] buffer = new byte[1024];
+                    Console.WriteLine("Download Started");
+                    totalBytes = client.MaxResponseContentBufferSize;
+
+                 
+                    for (; ; )
+                    {
+                        int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                        if (bytesRead == 0)
+                        {
+                            await Task.Yield();
+                            break;
+                        }
+                        
+                        receivedBytes += bytesRead;
+
+                        int received = unchecked((int)receivedBytes);
+                        int total = unchecked((int)totalBytes);
+
+                        double percentage = ((float)received) / total;
+                        Console.WriteLine(received / (1024) + "Kb / " + total / (1024) + " Kb");
+                        Console.WriteLine("Completed : " + percentage + "%");
+
+                    }
+
+                    using (var _stream = new FileStream("C:\\ProgramData\\TEST\\test.zip", FileMode.Create))
+                    {
+                        await stream.CopyToAsync(stream);
+                    }
+
+                }
+            }
         }
     }
 }
