@@ -22,16 +22,24 @@ namespace UpdateMyApp_Console
 
         private static async Task DownloadAsync()
         {
-            await Update.DownloadFileAsync("https://dl.dropboxusercontent.com/s/fmn3vswihogd2xj/FRITZ15.zip");
 
-            try
+            Update.DownloadedProgress += Update_downloadedProgress;
+
+            bool check = await Update.DownloadFileAsync("https://dl.dropboxusercontent.com/s/fmn3vswihogd2xj/FRITZ15.zip", "C:\\ProgramData\\TEST\\DownloadTest.zip");
+
+            if(check)
             {
-                var test5 = await Update.CheckForNewVersionAsync(null, null);
+
             }
-            catch (Exception ex)
+            else
             {
-                throw;
+
             }
+        }
+
+        private static void Update_downloadedProgress(long byteDownloaded, long byteToDownload, double percent)
+        {
+            Console.WriteLine($"Ściągnięto: {byteDownloaded} z: {byteToDownload} | {Convert.ToInt64(percent)} %");
         }
 
         private static void Main(string[] args)

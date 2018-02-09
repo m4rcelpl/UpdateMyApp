@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -17,7 +16,15 @@ namespace UpdateMyApp
         /// If you set to true you must catch all error. False by default.
         /// </summary>
         public static bool IsEnableError { get; set; } = false;
+
         private static readonly HttpClient client = new HttpClient();
+
+        public delegate void DownloadedProgressDelegate(Int64 byteDownloaded, Int64 byteToDownload, double perCentProgress);
+
+        /// <summary>
+        /// Subscribe to get byteDownloaded, byteToDownload and perCentProgress.
+        /// </summary>
+        public static event DownloadedProgressDelegate DownloadedProgress;
 
         /// <summary>
         /// Check from xml if new version is ready.
@@ -128,44 +135,103 @@ namespace UpdateMyApp
             return await ReadXmlFromURL(XmlURL);
         }
 
-
-        public static async Task DownloadFileAsync(string url)
+        private static async Task<Int64> GetFileSizeAsync(Uri uriPath)
         {
-            
-            using (HttpResponseMessage response = client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).Result)
+            try
             {
-                response.EnsureSuccessStatusCode();
+                var webRequest = HttpWebRequest.Create(uriPath);
+                webRequest.Method = "HEAD";
 
-                using (Stream contentStream = await response.Content.ReadAsStreamAsync(), fileStream = new FileStream("C:\\ProgramData\\TEST\\DownloadTest.zip", FileMode.Create, FileAccess.Write, FileShare.None, 1024, true))
+                using (var webResponse = await webRequest.GetResponseAsync())
                 {
-                    var totalRead = 0L;
-                    var totalReads = 0L;
-                    var buffer = new byte[1024];
-                    var isMoreToRead = true;
+                    return Convert.ToInt64(webResponse.Headers.Get("Content-Length"));
+                }
+            }
+            catch (Exception ex)
+            {
+                if (IsEnableError)
+                    throw;
+                else
+                {
+                    if (ex.InnerException != null)
+                        Debug.WriteLine($"[UpdateMyApp][{DateTime.Now}] {ex.InnerException.Message}");
+                    else
+                        Debug.WriteLine($"[UpdateMyApp][{DateTime.Now}] {ex.Message}");
 
-                    do
+                    return 0;
+                }
+            }
+        }
+
+        private static void EventDownloadedProgress(Int64 send, Int64 total)
+        {
+            double dProgress = ((double)send / total) * 100.0;
+            DownloadedProgress(send, total, dProgress);
+        }
+
+
+        /// <summary>
+        /// Download file from url. You can subscribe DownloadedProgress event do get progress. 
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="destinationPatch"></param>
+        /// <returns></returns>
+        public static async Task<bool> DownloadFileAsync(string url, string destinationPatch)
+        {
+            try
+            {
+                using (HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
+                using (Stream streamToReadFrom = await response.Content.ReadAsStreamAsync())
+                {
+                    using (Stream streamToWriteTo = File.Open(destinationPatch, FileMode.Create))
                     {
-                        var read = await contentStream.ReadAsync(buffer, 0, buffer.Length);
-                        if (read == 0)
+                        Int64 totalRead = 0L;
+                        var buffer = new byte[65536];
+                        var isMoreToRead = true;
+
+                        var FileSize = await GetFileSizeAsync(new Uri(url));
+
+                        do
                         {
-                            isMoreToRead = false;
+                            var read = await streamToReadFrom.ReadAsync(buffer, 0, buffer.Length);
+                            if (read == 0)
+                            {
+                                isMoreToRead = false;
+                            }
+                            else
+                            {
+                                await streamToWriteTo.WriteAsync(buffer, 0, read);
+
+                                totalRead += read;
+
+                                EventDownloadedProgress(totalRead, FileSize);
+                            }
+                        }
+                        while (isMoreToRead);
+
+                        if (totalRead == FileSize)
+                        {
+                            return true;
                         }
                         else
                         {
-                            await fileStream.WriteAsync(buffer, 0, read);
-
-                            totalRead += read;
-                            totalReads += 1;
-
-                            if (totalReads % 2000 == 0)
-                            {
-                                Console.Clear();
-                                Console.WriteLine(string.Format("total bytes downloaded so far: {0:n0}", totalRead));
-                                
-                            }
+                            return false;
                         }
                     }
-                    while (isMoreToRead);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (IsEnableError)
+                    throw;
+                else
+                {
+                    if (ex.InnerException != null)
+                        Debug.WriteLine($"[UpdateMyApp][{DateTime.Now}] {ex.InnerException.Message}");
+                    else
+                        Debug.WriteLine($"[UpdateMyApp][{DateTime.Now}] {ex.Message}");
+
+                    return false;
                 }
             }
         }
