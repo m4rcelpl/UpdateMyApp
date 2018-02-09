@@ -131,43 +131,41 @@ namespace UpdateMyApp
 
         public static async Task DownloadFileAsync(string url)
         {
-            long totalBytes;
-            long receivedBytes = 0;
-
-            using (var stream = await client.GetStreamAsync(url))
+            
+            using (HttpResponseMessage response = client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).Result)
             {
-                using (MemoryStream ms = new MemoryStream())
+                response.EnsureSuccessStatusCode();
+
+                using (Stream contentStream = await response.Content.ReadAsStreamAsync(), fileStream = new FileStream("C:\\ProgramData\\TEST\\DownloadTest.zip", FileMode.Create, FileAccess.Write, FileShare.None, 1024, true))
                 {
-                    byte[] buffer = new byte[1024];
-                    Console.WriteLine("Download Started");
-                    totalBytes = client.MaxResponseContentBufferSize;
+                    var totalRead = 0L;
+                    var totalReads = 0L;
+                    var buffer = new byte[1024];
+                    var isMoreToRead = true;
 
-                 
-                    for (; ; )
+                    do
                     {
-                        int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-                        if (bytesRead == 0)
+                        var read = await contentStream.ReadAsync(buffer, 0, buffer.Length);
+                        if (read == 0)
                         {
-                            await Task.Yield();
-                            break;
+                            isMoreToRead = false;
                         }
-                        
-                        receivedBytes += bytesRead;
+                        else
+                        {
+                            await fileStream.WriteAsync(buffer, 0, read);
 
-                        int received = unchecked((int)receivedBytes);
-                        int total = unchecked((int)totalBytes);
+                            totalRead += read;
+                            totalReads += 1;
 
-                        double percentage = ((float)received) / total;
-                        Console.WriteLine(received / (1024) + "Kb / " + total / (1024) + " Kb");
-                        Console.WriteLine("Completed : " + percentage + "%");
-
+                            if (totalReads % 2000 == 0)
+                            {
+                                Console.Clear();
+                                Console.WriteLine(string.Format("total bytes downloaded so far: {0:n0}", totalRead));
+                                
+                            }
+                        }
                     }
-
-                    using (var _stream = new FileStream("C:\\ProgramData\\TEST\\test.zip", FileMode.Create))
-                    {
-                        await stream.CopyToAsync(stream);
-                    }
-
+                    while (isMoreToRead);
                 }
             }
         }
