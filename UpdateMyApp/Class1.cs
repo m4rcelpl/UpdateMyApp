@@ -17,8 +17,9 @@ namespace UpdateMyApp
         /// </summary>
         public static bool IsEnableError { get; set; } = false;
 
+        private static Uri UrlToXML = null;
+        private static Version CurrentVersion = null;
         private static readonly HttpClient client = new HttpClient();
-
         public delegate void DownloadedProgressDelegate(Int64 byteDownloaded, Int64 byteToDownload, double perCentProgress);
 
         /// <summary>
@@ -26,28 +27,86 @@ namespace UpdateMyApp
         /// </summary>
         public static event DownloadedProgressDelegate DownloadedProgress;
 
+        public static bool SetCurrentVersion(string Version)
+        {
+            try
+            {
+                CurrentVersion = new Version(Version);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                if (IsEnableError)
+                    throw;
+                else
+                {
+                    if (ex.InnerException != null)
+                        Debug.WriteLine($"[UpdateMyApp][{DateTime.Now}] {ex.InnerException.Message}");
+                    else
+                        Debug.WriteLine($"[UpdateMyApp][{DateTime.Now}] {ex.Message}");
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Url"></param>
+        /// <returns></returns>
+        public static bool SetUrlToXml(string Url)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(Url) || string.IsNullOrWhiteSpace(Url))
+                {
+                    throw new NullReferenceException("Url is empty or null");
+                }
+                else
+                {
+                    Uri _temp = new Uri(Url);
+                    if (Path.GetExtension(_temp.LocalPath) == ".xml")
+                    {
+                        UrlToXML = _temp;
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (IsEnableError)
+                    throw;
+                else
+                {
+                    if (ex.InnerException != null)
+                        Debug.WriteLine($"[UpdateMyApp][{DateTime.Now}] {ex.InnerException.Message}");
+                    else
+                        Debug.WriteLine($"[UpdateMyApp][{DateTime.Now}] {ex.Message}");
+                }
+                return false;
+            }
+        }
+
         /// <summary>
         /// Check from xml if new version is ready.
         /// </summary>
         /// <param name="XmlURL">URL to XML file</param>
         /// <param name="CurrentAppVersion">Current version</param>
         /// <returns></returns>
-        public static async Task<bool> CheckForNewVersionAsync(string XmlURL, Version CurrentAppVersion)
+        public static async Task<bool> CheckForNewVersionAsync()
         {
-            if (string.IsNullOrEmpty(XmlURL) || string.IsNullOrWhiteSpace(XmlURL) || CurrentAppVersion == null)
+            if (UrlToXML == null || CurrentVersion == null)
             {
-                if (IsEnableError)
-                    throw new NullReferenceException("XmlURL is empty or null");
-                else
-                {
-                    Debug.WriteLine($"[UpdateMyApp][{DateTime.Now}] XmlURL or CurrentAppVersion is empty or null");
-                    return false;
-                }
+                throw new NullReferenceException("XmlURL is empty or null");
             }
 
             try
             {
-                Dictionary<string, string> _dictopnery = await ReadXmlFromURL(XmlURL);
+                Dictionary<string, string> _dictopnery = await ReadXmlFromURL();
 
                 if (_dictopnery.Count == 0)
                     return false;
@@ -57,7 +116,7 @@ namespace UpdateMyApp
                     _dictopnery.TryGetValue("version", out string _version);
                     Version VersionFromXml = new Version(_version);
 
-                    if (CurrentAppVersion < VersionFromXml)
+                    if (CurrentVersion < VersionFromXml)
                         return true;
                     else
                         return false;
@@ -88,8 +147,17 @@ namespace UpdateMyApp
             return false;
         }
 
-        private static async Task<Dictionary<string, string>> ReadXmlFromURL(string XmlURL)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private static async Task<Dictionary<string, string>> ReadXmlFromURL()
         {
+            if (UrlToXML == null)
+            {
+                throw new NullReferenceException("XmlURL is empty or null");
+            }
+
             Dictionary<string, string> _dictopnery = new Dictionary<string, string>();
 
             try
@@ -99,7 +167,7 @@ namespace UpdateMyApp
                     NoCache = true
                 };
 
-                var getXml = await client.GetAsync(XmlURL);
+                var getXml = await client.GetAsync(UrlToXML);
                 var stream = await getXml.Content.ReadAsStreamAsync();
                 var itemXml = XElement.Load(stream);
 
@@ -130,9 +198,9 @@ namespace UpdateMyApp
         /// </summary>
         /// <param name="XmlURL">URL to XML file</param>
         /// <returns></returns>
-        public static async Task<Dictionary<string, string>> ReadAllValueFromXml(string XmlURL)
+        public static async Task<Dictionary<string, string>> ReadAllValueFromXml()
         {
-            return await ReadXmlFromURL(XmlURL);
+            return await ReadXmlFromURL();
         }
 
         private static async Task<Int64> GetFileSizeAsync(Uri uriPath)
@@ -169,18 +237,25 @@ namespace UpdateMyApp
             DownloadedProgress(send, total, dProgress);
         }
 
-
         /// <summary>
-        /// Download file from url. You can subscribe DownloadedProgress event do get progress. 
+        /// Download file from url. You can subscribe DownloadedProgress event do get progress.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="destinationPatch"></param>
         /// <returns></returns>
-        public static async Task<bool> DownloadFileAsync(string url, string destinationPatch)
+        public static async Task<bool> DownloadFileAsync(string destinationPatch)
         {
+            if (UrlToXML == null)
+            {
+                throw new NullReferenceException("XmlURL is empty or null");
+            }
+
             try
             {
-                using (HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead))
+                Dictionary<string, string> _dictopnery = await ReadXmlFromURL();
+                _dictopnery.TryGetValue("url", out string URL);
+
+                using (HttpResponseMessage response = await client.GetAsync(URL, HttpCompletionOption.ResponseHeadersRead))
                 using (Stream streamToReadFrom = await response.Content.ReadAsStreamAsync())
                 {
                     using (Stream streamToWriteTo = File.Open(destinationPatch, FileMode.Create))
@@ -189,7 +264,7 @@ namespace UpdateMyApp
                         var buffer = new byte[65536];
                         var isMoreToRead = true;
 
-                        var FileSize = await GetFileSizeAsync(new Uri(url));
+                        var FileSize = await GetFileSizeAsync(new Uri(URL));
 
                         do
                         {
