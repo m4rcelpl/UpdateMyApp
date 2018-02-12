@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using UpdateMyApp;
 
 namespace UpdateMyApp_Console
 {
     internal class Program
     {
-
-
         private const string CorrectXmlURL = "https://dl.dropboxusercontent.com/s/3a1x9sis8pbekhk/UpdateMyAppTemplate.xml?=0";
         private const string BadXmlURL = "https://www.guugle.zn/jhbu.xml";
 
@@ -27,8 +23,10 @@ namespace UpdateMyApp_Console
             if (Update.SetUrlToXml(CorrectXmlURL))
                 if (Update.SetCurrentVersion(OlderstVersion))
                     if (await Update.CheckForNewVersionAsync())
-                        await Update.DownloadFileAsync("c:\\ProgramData\\TEST\\Test.zip");
-
+                    {
+                        await Update.DownloadFileAsync("E:\\Shared\\TEST\\Test.zip");
+                        Update.OpenURL();
+                    }
         }
 
         private static void Update_DownloadedProgress(long byteDownloaded, long byteToDownload, double perCentProgress)
@@ -38,9 +36,7 @@ namespace UpdateMyApp_Console
 
         private static void Main(string[] args)
         {
-
             DownloadAsync().Wait();
-
         }
     }
 }

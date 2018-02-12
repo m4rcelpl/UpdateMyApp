@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -18,8 +19,11 @@ namespace UpdateMyApp
         public static bool IsEnableError { get; set; } = false;
 
         private static Uri UrlToXML = null;
+        private static Uri FileUpdateURL = null;
         private static Version CurrentVersion = null;
+        private static Version RemoteVersion = null;
         private static readonly HttpClient client = new HttpClient();
+
         public delegate void DownloadedProgressDelegate(Int64 byteDownloaded, Int64 byteToDownload, double perCentProgress);
 
         /// <summary>
@@ -50,7 +54,7 @@ namespace UpdateMyApp
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="Url"></param>
         /// <returns></returns>
@@ -94,29 +98,29 @@ namespace UpdateMyApp
         /// <summary>
         /// Check from xml if new version is ready.
         /// </summary>
-        /// <param name="XmlURL">URL to XML file</param>
-        /// <param name="CurrentAppVersion">Current version</param>
-        /// <returns></returns>
         public static async Task<bool> CheckForNewVersionAsync()
         {
-            if (UrlToXML == null || CurrentVersion == null)
-            {
-                throw new NullReferenceException("XmlURL is empty or null");
-            }
-
             try
             {
+                if (UrlToXML == null || CurrentVersion == null)
+                {
+                    throw new NullReferenceException("Call first: SetUrlToXml and SetCurrentVersion");
+                }
+
                 Dictionary<string, string> _dictopnery = await ReadXmlFromURL();
 
                 if (_dictopnery.Count == 0)
                     return false;
 
-                if (_dictopnery.ContainsKey("version"))
-                {
-                    _dictopnery.TryGetValue("version", out string _version);
-                    Version VersionFromXml = new Version(_version);
+                if (_dictopnery.TryGetValue("url", out string outputUrl))
+                    Uri.TryCreate(outputUrl, UriKind.RelativeOrAbsolute, out FileUpdateURL);
 
-                    if (CurrentVersion < VersionFromXml)
+
+                if (_dictopnery.TryGetValue("version", out string _version))
+                {
+                    Version.TryParse(_version, out RemoteVersion);
+
+                    if (CurrentVersion < RemoteVersion)
                         return true;
                     else
                         return false;
@@ -148,9 +152,9 @@ namespace UpdateMyApp
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Task<Dictionary<string, string>></returns>
         private static async Task<Dictionary<string, string>> ReadXmlFromURL()
         {
             if (UrlToXML == null)
@@ -196,18 +200,20 @@ namespace UpdateMyApp
         /// <summary>
         /// Reed all data from you XML.
         /// </summary>
-        /// <param name="XmlURL">URL to XML file</param>
-        /// <returns></returns>
         public static async Task<Dictionary<string, string>> ReadAllValueFromXml()
         {
             return await ReadXmlFromURL();
         }
 
-        private static async Task<Int64> GetFileSizeAsync(Uri uriPath)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static async Task<Int64> GetFileSizeAsync()
         {
             try
             {
-                var webRequest = HttpWebRequest.Create(uriPath);
+                var webRequest = HttpWebRequest.Create(FileUpdateURL);
                 webRequest.Method = "HEAD";
 
                 using (var webResponse = await webRequest.GetResponseAsync())
@@ -231,31 +237,33 @@ namespace UpdateMyApp
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="send"></param>
+        /// <param name="total"></param>
         private static void EventDownloadedProgress(Int64 send, Int64 total)
         {
             double dProgress = ((double)send / total) * 100.0;
-            DownloadedProgress(send, total, dProgress);
+
+            DownloadedProgress?.Invoke(send, total, dProgress);
         }
 
         /// <summary>
         /// Download file from url. You can subscribe DownloadedProgress event do get progress.
         /// </summary>
-        /// <param name="url"></param>
         /// <param name="destinationPatch"></param>
         /// <returns></returns>
         public static async Task<bool> DownloadFileAsync(string destinationPatch)
         {
-            if (UrlToXML == null)
+            if (FileUpdateURL == null)
             {
-                throw new NullReferenceException("XmlURL is empty or null");
+                throw new NullReferenceException("URL to file is not set. Call CheckForNewVersionAsync first.");
             }
 
             try
             {
-                Dictionary<string, string> _dictopnery = await ReadXmlFromURL();
-                _dictopnery.TryGetValue("url", out string URL);
-
-                using (HttpResponseMessage response = await client.GetAsync(URL, HttpCompletionOption.ResponseHeadersRead))
+                using (HttpResponseMessage response = await client.GetAsync(FileUpdateURL, HttpCompletionOption.ResponseHeadersRead))
                 using (Stream streamToReadFrom = await response.Content.ReadAsStreamAsync())
                 {
                     using (Stream streamToWriteTo = File.Open(destinationPatch, FileMode.Create))
@@ -264,7 +272,7 @@ namespace UpdateMyApp
                         var buffer = new byte[65536];
                         var isMoreToRead = true;
 
-                        var FileSize = await GetFileSizeAsync(new Uri(URL));
+                        var FileSize = await GetFileSizeAsync();
 
                         do
                         {
@@ -307,6 +315,46 @@ namespace UpdateMyApp
                         Debug.WriteLine($"[UpdateMyApp][{DateTime.Now}] {ex.Message}");
 
                     return false;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Insted download file with update u can open website.
+        /// </summary>
+        public static void OpenURL()
+        {
+            try
+            {
+                if (FileUpdateURL == null)
+                {
+                    throw new NullReferenceException("URL to file is not set. Call CheckForNewVersionAsync first.");
+                }
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    Process.Start("cmd", $"/c start {FileUpdateURL}");
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    Process.Start("xdg-open", FileUpdateURL.ToString());
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("open", FileUpdateURL.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                if (IsEnableError)
+                    throw;
+                else
+                {
+                    if (ex.InnerException != null)
+                        Debug.WriteLine($"[UpdateMyApp][{DateTime.Now}] {ex.InnerException.Message}");
+                    else
+                        Debug.WriteLine($"[UpdateMyApp][{DateTime.Now}] {ex.Message}");
                 }
             }
         }
