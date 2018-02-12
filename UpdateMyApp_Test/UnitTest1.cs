@@ -23,7 +23,7 @@ namespace UpdateMyApp_Test
 
             try
             {
-                await Update.CheckForNewVersionAsync(CorrectXmlURL, null);
+                await Update.CheckForNewVersionAsync();
             }
             catch (Exception)
             {
@@ -39,7 +39,7 @@ namespace UpdateMyApp_Test
 
             try
             {
-                await Update.CheckForNewVersionAsync(null, new Version(NewestVersion));
+                await Update.CheckForNewVersionAsync();
             }
             catch (Exception)
             {
@@ -55,7 +55,7 @@ namespace UpdateMyApp_Test
 
             try
             {
-                await Update.CheckForNewVersionAsync(CorrectXmlURL, new Version(""));
+                await Update.CheckForNewVersionAsync();
             }
             catch (Exception)
             {
@@ -71,7 +71,7 @@ namespace UpdateMyApp_Test
 
             try
             {
-                await Update.CheckForNewVersionAsync("", new Version(NewestVersion));
+                await Update.CheckForNewVersionAsync();
             }
             catch (Exception)
             {
@@ -87,7 +87,7 @@ namespace UpdateMyApp_Test
 
             try
             {
-                await Update.CheckForNewVersionAsync(CorrectXmlURL, new Version(" "));
+                await Update.CheckForNewVersionAsync();
             }
             catch (Exception)
             {
@@ -103,7 +103,7 @@ namespace UpdateMyApp_Test
 
             try
             {
-                await Update.CheckForNewVersionAsync(" ", new Version(NewestVersion));
+                await Update.CheckForNewVersionAsync();
             }
             catch (Exception)
             {
@@ -114,13 +114,13 @@ namespace UpdateMyApp_Test
         [TestMethod]
         public async Task CheckForNewVersionTrueAsync()
         {
-            Assert.IsTrue(await Update.CheckForNewVersionAsync(CorrectXmlURL, new Version(OlderstVersion)));
+            Assert.IsTrue(await Update.CheckForNewVersionAsync());
         }
 
         [TestMethod]
         public async Task CheckForNewVersionFalseAsync()
         {
-            Assert.IsFalse(await Update.CheckForNewVersionAsync(CorrectXmlURL, new Version(NewestVersion)));
+            Assert.IsFalse(await Update.CheckForNewVersionAsync());
         }
     }
 }
