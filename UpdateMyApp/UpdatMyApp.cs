@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -115,7 +116,6 @@ namespace UpdateMyApp
                 if (_dictopnery.TryGetValue("url", out string outputUrl))
                     Uri.TryCreate(outputUrl, UriKind.RelativeOrAbsolute, out FileUpdateURL);
 
-
                 if (_dictopnery.TryGetValue("version", out string _version))
                 {
                     Version.TryParse(_version, out RemoteVersion);
@@ -205,9 +205,8 @@ namespace UpdateMyApp
             return await ReadXmlFromURL();
         }
 
-
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private static async Task<Int64> GetFileSizeAsync()
         {
@@ -238,7 +237,7 @@ namespace UpdateMyApp
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="send"></param>
         /// <param name="total"></param>
@@ -319,7 +318,6 @@ namespace UpdateMyApp
             }
         }
 
-
         /// <summary>
         /// Insted download file with update u can open website.
         /// </summary>
@@ -327,23 +325,7 @@ namespace UpdateMyApp
         {
             try
             {
-                if (FileUpdateURL == null)
-                {
-                    throw new NullReferenceException("URL to file is not set. Call CheckForNewVersionAsync first.");
-                }
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    Process.Start("cmd", $"/c start {FileUpdateURL}");
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {
-                    Process.Start("xdg-open", FileUpdateURL.ToString());
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    Process.Start("open", FileUpdateURL.ToString());
-                }
+                Process.Start(FileUpdateURL.ToString());
             }
             catch (Exception ex)
             {

@@ -1,0 +1,5 @@
+C:\Users\mgarbarczyk\Documents\GitHub\UpdateMyApp\UpdateMyApp\bin\Release\UpdateMyApp.dll
+C:\Users\mgarbarczyk\Documents\GitHub\UpdateMyApp\UpdateMyApp\bin\Release\UpdateMyApp.pdb
+C:\Users\mgarbarczyk\Documents\GitHub\UpdateMyApp\UpdateMyApp\obj\Release\UpdateMyApp.csproj.CoreCompileInputs.cache
+C:\Users\mgarbarczyk\Documents\GitHub\UpdateMyApp\UpdateMyApp\obj\Release\UpdateMyApp.dll
+C:\Users\mgarbarczyk\Documents\GitHub\UpdateMyApp\UpdateMyApp\obj\Release\UpdateMyApp.pdb
