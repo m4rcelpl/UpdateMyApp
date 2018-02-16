@@ -24,6 +24,8 @@ bld/
 [Oo]bj/
 [Ll]og/
 TEST FILES/
+UpdateMyApp/obj/
+UpdateMyApp/bin/
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -288,3 +290,4 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 .vs/UpdateMyApp/v15/.suo
+UpdateMyApp/obj/Debug/UpdateMyApp.pdb
