@@ -1,6 +1,0 @@
-C:\Users\mgarbarczyk\Documents\GitHub\UpdateMyApp\UpdateMyApp\bin\Debug\UpdateMyApp.dll
-C:\Users\mgarbarczyk\Documents\GitHub\UpdateMyApp\UpdateMyApp\bin\Debug\UpdateMyApp.pdb
-C:\Users\mgarbarczyk\Documents\GitHub\UpdateMyApp\UpdateMyApp\obj\Debug\UpdateMyApp.csprojResolveAssemblyReference.cache
-C:\Users\mgarbarczyk\Documents\GitHub\UpdateMyApp\UpdateMyApp\obj\Debug\UpdateMyApp.csproj.CoreCompileInputs.cache
-C:\Users\mgarbarczyk\Documents\GitHub\UpdateMyApp\UpdateMyApp\obj\Debug\UpdateMyApp.dll
-C:\Users\mgarbarczyk\Documents\GitHub\UpdateMyApp\UpdateMyApp\obj\Debug\UpdateMyApp.pdb
