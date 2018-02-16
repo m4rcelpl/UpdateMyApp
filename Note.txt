@@ -1,1 +1,8 @@
+Get NuGet package:
+NuGet.Build.Tasks.Pack
+
+Add to csproj:
+<RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+
+Run command:
 dotnet pack /p:Configuration=Release
