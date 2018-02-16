@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using UpdateMyApp;
 
 namespace UpdateMyApp_ConsoleApp_Test
 {
-    class Program
+    internal class Program
     {
         private const string CorrectXmlURL = "https://dl.dropboxusercontent.com/s/3a1x9sis8pbekhk/UpdateMyAppTemplate.xml?=0";
         private const string BadXmlURL = "https://www.guugle.zn/jhbu.xml";
@@ -34,7 +31,7 @@ namespace UpdateMyApp_ConsoleApp_Test
 
         private static void Update_DownloadedProgress(long byteDownloaded, long byteToDownload, double perCentProgress)
         {
-            Console.WriteLine($"Ściągnięto: {byteDownloaded} z: {byteToDownload} | {perCentProgress}");
+            Console.WriteLine($"Downloaded: {byteDownloaded} from: {byteToDownload} | {perCentProgress}");
         }
 
         private static void Main(string[] args)

@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -15,7 +13,7 @@ namespace UpdateMyApp
     public class Update
     {
         /// <summary>
-        /// If you set to true you must catch all error. False by default.
+        /// If you set to true you must catch all error.
         /// </summary>
         public static bool IsEnableError { get; set; } = false;
 
@@ -32,6 +30,11 @@ namespace UpdateMyApp
         /// </summary>
         public static event DownloadedProgressDelegate DownloadedProgress;
 
+        /// <summary>
+        /// Set your current application version.
+        /// </summary>
+        /// <param name="Version"></param>
+        /// <returns></returns>
         public static bool SetCurrentVersion(string Version)
         {
             try
@@ -55,7 +58,7 @@ namespace UpdateMyApp
         }
 
         /// <summary>
-        ///
+        /// Set URL to your XML file.
         /// </summary>
         /// <param name="Url"></param>
         /// <returns></returns>
@@ -97,7 +100,7 @@ namespace UpdateMyApp
         }
 
         /// <summary>
-        /// Check from xml if new version is ready.
+        /// Check if new version is ready.
         /// </summary>
         public static async Task<bool> CheckForNewVersionAsync()
         {
@@ -108,7 +111,7 @@ namespace UpdateMyApp
                     throw new NullReferenceException("Call first: SetUrlToXml and SetCurrentVersion");
                 }
 
-                Dictionary<string, string> _dictopnery = await ReadXmlFromURL();
+                Dictionary<string, string> _dictopnery = await ReadXmlFromURLAsync();
 
                 if (_dictopnery.Count == 0)
                     return false;
@@ -152,10 +155,10 @@ namespace UpdateMyApp
         }
 
         /// <summary>
-        ///
+        /// Private.
         /// </summary>
         /// <returns>Task<Dictionary<string, string>></returns>
-        private static async Task<Dictionary<string, string>> ReadXmlFromURL()
+        private static async Task<Dictionary<string, string>> ReadXmlFromURLAsync()
         {
             if (UrlToXML == null)
             {
@@ -200,13 +203,13 @@ namespace UpdateMyApp
         /// <summary>
         /// Reed all data from you XML.
         /// </summary>
-        public static async Task<Dictionary<string, string>> ReadAllValueFromXml()
+        public static async Task<Dictionary<string, string>> ReadAllValueFromXmlAsync()
         {
-            return await ReadXmlFromURL();
+            return await ReadXmlFromURLAsync();
         }
 
         /// <summary>
-        ///
+        /// Private.
         /// </summary>
         private static async Task<Int64> GetFileSizeAsync()
         {
@@ -237,10 +240,8 @@ namespace UpdateMyApp
         }
 
         /// <summary>
-        ///
+        /// Private
         /// </summary>
-        /// <param name="send"></param>
-        /// <param name="total"></param>
         private static void EventDownloadedProgress(Int64 send, Int64 total)
         {
             double dProgress = ((double)send / total) * 100.0;
@@ -319,7 +320,7 @@ namespace UpdateMyApp
         }
 
         /// <summary>
-        /// Insted download file with update u can open website.
+        /// Open website instead of downloading file.
         /// </summary>
         public static void OpenURL()
         {
