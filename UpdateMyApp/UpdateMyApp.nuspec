@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>UpdateMyApp</id>
+    <version>1.2.0.0</version>
+    <title>Update My App</title>
+    <authors>Marcel Garbarczyk</authors>
+    <owners>Marcel Garbarczyk</owners>
+    <licenseUrl>https://github.com/m4rcelpl/UpdateMyApp/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/m4rcelpl/UpdateMyApp</projectUrl>
+    <iconUrl>https://github.com/m4rcelpl/UpdateMyApp</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+Small library supporting the update process. 
+
+Key options
+
+* Less than 20 KB.
+* Async.
+* You can define extra data in config file.
+* Support download progress (byte and percent).
+	</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2018</copyright>
+    <tags>DotNET C# update</tags>
+  </metadata>
+</package>

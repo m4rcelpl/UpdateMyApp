@@ -58,6 +58,33 @@ namespace UpdateMyApp
         }
 
         /// <summary>
+        /// Set your current application version.
+        /// </summary>
+        /// <param name="Version"></param>
+        /// <returns></returns>
+        public static bool SetCurrentVersion(Version Version)
+        {
+            try
+            {
+                CurrentVersion = Version;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                if (IsEnableError)
+                    throw;
+                else
+                {
+                    if (ex.InnerException != null)
+                        Debug.WriteLine($"[UpdateMyApp][{DateTime.Now}] {ex.InnerException.Message}");
+                    else
+                        Debug.WriteLine($"[UpdateMyApp][{DateTime.Now}] {ex.Message}");
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Set URL to your XML file.
         /// </summary>
         /// <param name="Url"></param>
@@ -201,16 +228,13 @@ namespace UpdateMyApp
         }
 
         /// <summary>
-        /// Reed all data from you XML.
+        /// Read all data from you XML.
         /// </summary>
         public static async Task<Dictionary<string, string>> ReadAllValueFromXmlAsync()
         {
             return await ReadXmlFromURLAsync();
         }
 
-        /// <summary>
-        /// Private.
-        /// </summary>
         private static async Task<Int64> GetFileSizeAsync()
         {
             try
@@ -239,9 +263,7 @@ namespace UpdateMyApp
             }
         }
 
-        /// <summary>
-        /// Private
-        /// </summary>
+
         private static void EventDownloadedProgress(Int64 send, Int64 total)
         {
             double dProgress = ((double)send / total) * 100.0;
