@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>UpdateMyApp</id>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
     <title>Update My App</title>
     <authors>Marcel Garbarczyk</authors>
     <owners>Marcel Garbarczyk</owners>
@@ -19,23 +19,9 @@ Key options
 * Async.
 * You can define extra data in config file.
 * Support download progress (byte and percent).
-
-Minimum version of .NET is 4.6
 	</description>
     <releaseNotes></releaseNotes>
     <copyright>Copyright 2018</copyright>
-    <tags>DotNET C# update</tags>
-	<frameworkAssemblies>
-	<frameworkAssembly assemblyName="System"/>
-    <frameworkAssembly assemblyName="System.Xml.Linq"  />
-    <frameworkAssembly assemblyName="System.Threading.Tasks"/>
-	<frameworkAssembly assemblyName="System.Net.Http.Headers"/>
-	<frameworkAssembly assemblyName="System.Net.Http"/>
-	<frameworkAssembly assemblyName="System.Net"/>
-	<frameworkAssembly assemblyName="System.IO"/>
-	<frameworkAssembly assemblyName="System.Diagnostics"/>
-	<frameworkAssembly assemblyName="System.Collections.Generic"/>
-	
-</frameworkAssemblies>
+    <tags>DotNET C# update</tags>	
   </metadata>
 </package>
