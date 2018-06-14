@@ -12,7 +12,7 @@ Key options
 https://www.nuget.org/packages/UpdateMyApp/
 
 ```
-Install-Package UpdateMyApp -Version 1.2.0
+Install-Package UpdateMyApp
 ```
 
 
