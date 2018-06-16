@@ -1,5 +1,5 @@
 # Update My App
-Small library supporting the update process. 
+Lightweight library with updates support for your app.
 
 Key options
 
