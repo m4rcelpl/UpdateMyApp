@@ -15,8 +15,6 @@ namespace UpdateMyApp_ConsoleApp_Test
 
             Update.DownloadedProgress += Update_DownloadedProgress;
 
-            Update.SetCurrentVersion(System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
-
             if (Update.SetUrlToXml(CorrectXmlURL))
                 if (Update.SetCurrentVersion("1.0.0"))
                     if (await Update.CheckForNewVersionAsync())
