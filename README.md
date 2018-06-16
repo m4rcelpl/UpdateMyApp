@@ -58,7 +58,7 @@ await Update.DownloadFileAsync(@"E:\Shared\My_App\My_App_New.zip"); //[bool] ret
  Update.OpenURL();
  ```
 
- If you download file you can view progrees
+ If you download file you can view progress
  ```CSharp
  Update.DownloadedProgress += Update_DownloadedProgress;
 
@@ -79,7 +79,7 @@ if (!string.IsNullOrEmpty(whatsNew))
 
 **Error handling**
 
-By defoult all error are ignored. If you want catch some, set this at the beginning.
+By default all error are ignored. If you want to catch some, set this at the beginning.
 ```CSharp
 Update.IsEnableError = true;
 ```
