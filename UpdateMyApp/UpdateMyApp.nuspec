@@ -8,10 +8,10 @@
     <owners>Marcel Garbarczyk</owners>
     <licenseUrl>https://github.com/m4rcelpl/UpdateMyApp/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/m4rcelpl/UpdateMyApp</projectUrl>
-    <iconUrl>https://github.com/m4rcelpl/UpdateMyApp</iconUrl>
+    <iconUrl>https://github.com/m4rcelpl/UpdateMyApp/raw/master/logo64na64.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
-Small library supporting the update process. 
+Lightweight library with updates support for your app.
 
 Key options
 
