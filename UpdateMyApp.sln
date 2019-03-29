@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateMyApp", "UpdateMyApp\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateMyApp_Console_Test", "UpdateMyApp_Console_Test\UpdateMyApp_Console_Test.csproj", "{BBD2D2F0-239F-4025-939E-47E4BC154616}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateMyApp_Net_Standard", "UpdateMyApp_Net_Standard\UpdateMyApp_Net_Standard.csproj", "{846B7EE2-CFDE-4A39-9071-8869E176ABBE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{BBD2D2F0-239F-4025-939E-47E4BC154616}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBD2D2F0-239F-4025-939E-47E4BC154616}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBD2D2F0-239F-4025-939E-47E4BC154616}.Release|Any CPU.Build.0 = Release|Any CPU
+		{846B7EE2-CFDE-4A39-9071-8869E176ABBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{846B7EE2-CFDE-4A39-9071-8869E176ABBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{846B7EE2-CFDE-4A39-9071-8869E176ABBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{846B7EE2-CFDE-4A39-9071-8869E176ABBE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
